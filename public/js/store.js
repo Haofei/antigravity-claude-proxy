@@ -5,6 +5,33 @@
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('global', {
+        init() {
+            // Hash-based routing
+            const validTabs = ['dashboard', 'models', 'accounts', 'logs', 'settings'];
+            const getHash = () => window.location.hash.substring(1);
+
+            // 1. Initial load from hash
+            const initialHash = getHash();
+            if (validTabs.includes(initialHash)) {
+                this.activeTab = initialHash;
+            }
+
+            // 2. Sync State -> URL
+            Alpine.effect(() => {
+                if (validTabs.includes(this.activeTab) && getHash() !== this.activeTab) {
+                    window.location.hash = this.activeTab;
+                }
+            });
+
+            // 3. Sync URL -> State (Back/Forward buttons)
+            window.addEventListener('hashchange', () => {
+                const hash = getHash();
+                if (validTabs.includes(hash) && this.activeTab !== hash) {
+                    this.activeTab = hash;
+                }
+            });
+        },
+
         // App State
         version: '1.0.0',
         activeTab: 'dashboard',

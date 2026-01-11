@@ -33,13 +33,54 @@ document.addEventListener('alpine:init', () => {
         // For simplicity, let's keep relevant filters here.
 
         init() {
+            // Restore from cache first for instant render
+            this.loadFromCache();
+
             // Watch filters to recompute
             // Alpine stores don't have $watch automatically unless inside a component?
             // We can manually call compute when filters change.
         },
 
+        loadFromCache() {
+            try {
+                const cached = localStorage.getItem('ag_data_cache');
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    // Basic validty check
+                    if (data.accounts && data.models) {
+                        this.accounts = data.accounts;
+                        this.models = data.models;
+                        this.modelConfig = data.modelConfig || {};
+                        this.usageHistory = data.usageHistory || {};
+                        
+                        // Don't show loading on initial load if we have cache
+                        this.initialLoad = false;
+                        this.computeQuotaRows();
+                        console.log('Restored data from cache');
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load cache', e);
+            }
+        },
+
+        saveToCache() {
+            try {
+                const cacheData = {
+                    accounts: this.accounts,
+                    models: this.models,
+                    modelConfig: this.modelConfig,
+                    usageHistory: this.usageHistory,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('ag_data_cache', JSON.stringify(cacheData));
+            } catch (e) {
+                console.warn('Failed to save cache', e);
+            }
+        },
+
         async fetchData() {
-            // Only show skeleton on initial load, not on refresh
+            // Only show skeleton on initial load if we didn't restore from cache
             if (this.initialLoad) {
                 this.loading = true;
             }
@@ -67,6 +108,7 @@ document.addEventListener('alpine:init', () => {
                     this.usageHistory = data.history;
                 }
 
+                this.saveToCache(); // Save fresh data
                 this.computeQuotaRows();
 
                 this.connectionStatus = 'connected';
