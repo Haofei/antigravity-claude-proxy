@@ -253,12 +253,27 @@
                                         </div>
                                     </template>
                                 </div>
-                                <!-- Threshold text under bar -->
-                                <div x-show="row.effectiveThresholdPct > 0"
-                                     class="text-[10px] font-mono text-gray-500 -mt-0.5"
-                                     x-text="row.hasVariedThresholds
-                                         ? 'min: ' + Math.min(...row.quotaInfo.map(q => q.thresholdPct).filter(t => t > 0)) + '–' + row.effectiveThresholdPct + '%'
-                                         : 'min: ' + row.effectiveThresholdPct + '%'"></div>
+                                <!-- Per-account breakdown (non-compact only) -->
+                                <div x-show="!$store.settings.compact && row.quotaInfo && row.quotaInfo.length > 1"
+                                     class="flex flex-col gap-1 mt-1 pt-1 border-t border-space-border/30">
+                                    <template x-for="q in row.quotaInfo" :key="q.fullEmail + '-detail'">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-mono text-gray-500 w-20 truncate text-right flex-shrink-0"
+                                                  x-text="q.email"></span>
+                                            <div class="flex-1 h-1 rounded-full bg-space-800 overflow-hidden">
+                                                <div class="h-full rounded-full transition-all duration-500"
+                                                     :class="q.pct > 50 ? 'bg-neon-green/70' : (q.pct > 0 ? 'bg-yellow-500/70' : 'bg-red-500/50')"
+                                                     :style="'width: ' + q.pct + '%'"></div>
+                                            </div>
+                                            <span class="text-[10px] font-mono w-8 text-right flex-shrink-0"
+                                                  :class="q.pct > 0 ? 'text-gray-400' : 'text-red-500/70'"
+                                                  x-text="q.pct + '%'"></span>
+                                            <span x-show="q.resetTime"
+                                                  class="text-[9px] font-mono text-gray-600 w-12 text-right flex-shrink-0"
+                                                  x-text="q.resetTime ? window.utils.formatTimeUntil(q.resetTime) : ''"></span>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </td>
                         <td x-show="!$store.settings.compact" class="font-mono text-xs">
