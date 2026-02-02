@@ -172,7 +172,7 @@ function parseError(error) {
     } else if (error.message.includes('PERMISSION_DENIED')) {
         errorType = 'permission_error';
         statusCode = 403;
-        errorMessage = 'Permission denied. Check your Antigravity license.';
+        errorMessage = errorMessage;
     }
 
     return { errorType, statusCode, errorMessage };
