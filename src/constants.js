@@ -102,7 +102,10 @@ export const ANTIGRAVITY_ENDPOINT_FALLBACKS = [
 // Strictly matches the generic 'u' method in main.js
 export const ANTIGRAVITY_HEADERS = {
     'User-Agent': getPlatformUserAgent(),
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-Client-Name': 'antigravity',
+    'X-Client-Version': '1.107.0', // Match product.json version
+    'x-goog-api-client': 'gl-node/18.18.2 fire/0.8.6 grpc/1.10.x' // Simulate Google Node.js client environment
 };
 
 // Endpoint order for loadCodeAssist (prod first)
