@@ -1,5 +1,3 @@
-# ⚠️ DO NOT USE THIS ANYMORE – GOOGLE IS ISSUING TOS VIOLATION BANS FOR THE ACCOUNTS CONNECTED
-
 # Antigravity Claude Proxy
 
 [![npm version](https://img.shields.io/npm/v/antigravity-claude-proxy.svg)](https://www.npmjs.com/package/antigravity-claude-proxy)
@@ -9,6 +7,8 @@
 A proxy server that exposes an **Anthropic-compatible API** backed by **Antigravity's Cloud Code**, letting you use Claude and Gemini models with **Claude Code CLI** and **OpenClaw / ClawdBot**.
 
 ![Antigravity Claude Proxy Banner](images/banner.png)
+
+> **⚠️ WARNING:** Google has been issuing ToS violation bans on accounts connected to this proxy. Use at your own risk.
 
 <details>
 <summary><strong>⚠️ Terms of Service Warning — Read Before Installing</strong></summary>
@@ -82,18 +82,10 @@ npm start
 
 ### 1. Start the Proxy Server
 
-The proxy now supports background process management.
-
 ```bash
-# Using the shorthand alias (recommended)
-acc start          # Start server as background process
-acc stop           # Stop the server
-acc restart        # Restart the server
-acc status         # Check server status
-acc ui             # Open WebUI in browser
-
-# Or using the full command name
-antigravity-claude-proxy start
+# If installed globally
+acc start
+# or: antigravity-claude-proxy start
 
 # If using npx
 npx antigravity-claude-proxy@latest start
@@ -102,13 +94,16 @@ npx antigravity-claude-proxy@latest start
 npm start
 ```
 
-The server runs on `http://localhost:8080` by default.
+The server launches as a **background process** on `http://localhost:8080` by default and survives terminal closure.
 
-**Background Process Features:**
-- Server runs in the background (detached process)
-- PID file stored in `~/.config/antigravity-proxy/server.pid`
-- Survives terminal closure
-- Easy start/stop/restart management
+| Command | Description |
+| :--- | :--- |
+| `acc start` | Launch proxy in the background |
+| `acc stop` | Shut down the proxy |
+| `acc restart` | Restart the proxy |
+| `acc status` | Check proxy health and PID |
+| `acc ui` | Open the web dashboard |
+| `acc start --log` | Run in foreground with visible logs |
 
 ### 2. Link Account(s)
 
