@@ -177,7 +177,11 @@ export function convertAnthropicToGoogle(anthropicRequest) {
             const currentMaxTokens = googleRequest.generationConfig.maxOutputTokens;
             if (currentMaxTokens && currentMaxTokens <= thinkingBudget) {
                 const adjustedMaxTokens = thinkingBudget + 8192;
-                logger.warn(`[RequestConverter] max_tokens (${currentMaxTokens}) <= thinking_budget (${thinkingBudget}). Adjusting to ${adjustedMaxTokens} to satisfy API requirements`);
+                if (thinking?.budget_tokens) {
+                    logger.warn(`[RequestConverter] max_tokens (${currentMaxTokens}) <= thinking_budget (${thinkingBudget}). Adjusting to ${adjustedMaxTokens} to satisfy API requirements`);
+                } else {
+                    logger.debug(`[RequestConverter] Adjusting max_tokens to ${adjustedMaxTokens} for default thinking budget`);
+                }
                 googleRequest.generationConfig.maxOutputTokens = adjustedMaxTokens;
             }
 
