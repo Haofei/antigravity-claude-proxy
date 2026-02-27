@@ -166,23 +166,19 @@ export function convertAnthropicToGoogle(anthropicRequest) {
                 include_thoughts: true
             };
 
-            // Only set thinking_budget if explicitly provided
-            const thinkingBudget = thinking?.budget_tokens;
-            if (thinkingBudget) {
-                thinkingConfig.thinking_budget = thinkingBudget;
-                logger.debug(`[RequestConverter] Claude thinking enabled with budget: ${thinkingBudget}`);
+            // Cloud Code API requires thinking_budget to actually produce thinking blocks.
+            // Without it, include_thoughts alone is ignored and Claude falls back to
+            // <thinking> XML tags in text. Default to 32000 when not provided (e.g. adaptive mode).
+            const thinkingBudget = thinking?.budget_tokens || 32000;
+            thinkingConfig.thinking_budget = thinkingBudget;
+            logger.debug(`[RequestConverter] Claude thinking enabled with budget: ${thinkingBudget}${!thinking?.budget_tokens ? ' (default)' : ''}`);
 
-                // Validate max_tokens > thinking_budget as required by the API
-                const currentMaxTokens = googleRequest.generationConfig.maxOutputTokens;
-                if (currentMaxTokens && currentMaxTokens <= thinkingBudget) {
-                    // Bump max_tokens to allow for some response content
-                    // Default to budget + 8192 (standard output buffer)
-                    const adjustedMaxTokens = thinkingBudget + 8192;
-                    logger.warn(`[RequestConverter] max_tokens (${currentMaxTokens}) <= thinking_budget (${thinkingBudget}). Adjusting to ${adjustedMaxTokens} to satisfy API requirements`);
-                    googleRequest.generationConfig.maxOutputTokens = adjustedMaxTokens;
-                }
-            } else {
-                logger.debug('[RequestConverter] Claude thinking enabled (no budget specified)');
+            // Validate max_tokens > thinking_budget as required by the API
+            const currentMaxTokens = googleRequest.generationConfig.maxOutputTokens;
+            if (currentMaxTokens && currentMaxTokens <= thinkingBudget) {
+                const adjustedMaxTokens = thinkingBudget + 8192;
+                logger.warn(`[RequestConverter] max_tokens (${currentMaxTokens}) <= thinking_budget (${thinkingBudget}). Adjusting to ${adjustedMaxTokens} to satisfy API requirements`);
+                googleRequest.generationConfig.maxOutputTokens = adjustedMaxTokens;
             }
 
             googleRequest.generationConfig.thinkingConfig = thinkingConfig;
